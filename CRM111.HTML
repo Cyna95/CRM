@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Nowoczesny CRM GPS – Zlecenia, Zadania, Rentowność</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    .app-container {
+      flex: 1;
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .main-panel {
+      flex: 1;
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.75);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .badge {
+      background: rgba(34,197,94,0.12);
+      color: #4ade80;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    .right-tabs {
+      width: 220px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+    }
+
+    .tabs-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #6b7280;
+      margin-bottom: 4px;
+      padding: 0 4px;
+    }
+
+    .tab-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: #020617;
+      color: #9ca3af;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+
+    .tab-button span {
+      pointer-events: none;
+    }
+
+    .tab-button:hover {
+      border-color: #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      transform: translateY(-1px);
+    }
+
+    .tab-button.active {
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+      color: #0b1120;
+      font-weight: 600;
+      box-shadow: 0 15px 30px -15px rgba(16,185,129,0.9);
+    }
+
+    .tab-badge {
+      font-size: 11px;
+      background: rgba(15,23,42,0.65);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .tab-button.active .tab-badge {
+      background: rgba(15,23,42,0.85);
+      color: #e5e7eb;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .footer-note {
+      font-size: 10px;
+      color: #4b5563;
+      text-align: center;
+    }
+
+    .tab-view {
+      display: none;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .tab-view.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card {
+      background: rgba(15,23,42,0.88);
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid rgba(55,65,81,0.8);
+      margin-bottom: 12px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px 16px;
+      margin-top: 8px;
+    }
+
+    label {
+      font-size: 11px;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 7px 8px;
+      border-radius: 9px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.65);
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+      color: #020617;
+      font-weight: 600;
+      box-shadow: 0 15px 30px -15px rgba(34,197,94,0.9);
+    }
+
+    .btn-secondary {
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      border: 1px solid #374151;
+    }
+
+    .btn-sm {
+      padding: 5px 9px;
+      font-size: 11px;
+      border-radius: 999px;
+    }
+
+    .btn-inline-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .table-wrapper {
+      flex: 1;
+      overflow: auto;
+      margin-top: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 700px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: #020617;
+      z-index: 5;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid #1f2937;
+      white-space: nowrap;
+    }
+
+    th {
+      font-size: 11px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(15,23,42,0.75);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(15,23,42,0.5);
+    }
+
+    .chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: rgba(30,64,175,0.4);
+      color: #bfdbfe;
+    }
+
+    .chip-serwis {
+      background: rgba(220,38,38,0.2);
+      color: #fecaca;
+    }
+
+    .kanban-container {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      flex: 1;
+      overflow: auto;
+      margin-top: 10px;
+    }
+
+    .kanban-column {
+      background: rgba(15,23,42,0.9);
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px dashed #374151;
+      min-height: 120px;
+    }
+
+    .kanban-column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+
+    .kanban-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #9ca3af;
+    }
+
+    .kanban-count {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .task-card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #1f2937;
+      font-size: 12px;
+      cursor: grab;
+    }
+
+    .task-card.dragging {
+      opacity: 0.6;
+      border-style: dashed;
+    }
+
+    .task-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .task-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .task-assignee {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.15);
+      color: #93c5fd;
+    }
+
+    .task-due {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.12);
+      color: #4ade80;
+    }
+
+    .task-due.overdue {
+      background: rgba(220,38,38,0.25);
+      color: #fecaca;
+      font-weight: 600;
+    }
+
+    .overdue-border {
+      border-color: rgba(220,38,38,0.75);
+      box-shadow: 0 0 0 1px rgba(220,38,38,0.5);
+    }
+
+    .small-muted {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .stat-box {
+      background: #020617;
+      border-radius: 10px;
+      padding: 8px 10px;
+      border: 1px solid #1f2937;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .stat-positive {
+      color: #4ade80;
+    }
+
+    .stat-negative {
+      color: #f97373;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      .app-container {
+        flex-direction: column-reverse;
+      }
+      .right-tabs {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+      }
+      .tab-button {
+        flex: 1;
+      }
+      .tabs-title, .footer-note {
+        display: none;
+      }
+      .main-panel {
+        height: calc(100vh - 130px);
+      }
+      .kanban-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kanban-container {
+        grid-template-columns: 1fr;
+      }
+      table {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <!-- PANEL GŁÓWNY -->
+  <div class="main-panel">
+    <div class="header">
+      <div>
+        <div class="header-title">CRM GPS – Zlecenia, Zadania, Rentowność</div>
+        <div class="header-subtitle">Montaże • Serwis • Abonamenty • Analiza zysków</div>
+      </div>
+      <div class="badge">Demo offline – zapis do localStorage</div>
+    </div>
+
+    <!-- ZAKŁADKA: ZLECENIA -->
+    <div id="tab-zlecenia" class="tab-view active">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Nowe zlecenie</div>
+          <div class="card-subtitle">Montaż / serwis z analizą ceny urządzenia, abonamentu i montażu</div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Rodzaj zlecenia</label>
+            <select id="zlecenie-rodzaj">
+              <option value="montaz">Nowy montaż GPS</option>
+              <option value="serwis">Serwis</option>
+              <option value="inne">Inne</option>
+            </select>
+          </div>
+          <div>
+            <label>Urządzenie</label>
+            <select id="zlecenie-urzadzenie">
+              <option value="FMT100">FMT100</option>
+              <option value="FMC880">FMC880</option>
+              <option value="FMB920">FMB920</option>
+              <option value="FMC650">FMC650</option>
+              <option value="FMC130">FMC130</option>
+              <option value="inne">Inne (wpisz poniżej)</option>
+            </select>
+          </div>
+          <div>
+            <label>Inne urządzenie (opcjonalnie)</label>
+            <input type="text" id="zlecenie-urzadzenie-inne" placeholder="np. FMB140 PRO">
+          </div>
+          <div>
+            <label>Cena urządzenia (sprzedaż dla klienta, PLN)</label>
+            <input type="number" id="zlecenie-cena-urzadzenia" min="0" step="0.01" placeholder="np. 399">
+          </div>
+          <div>
+            <label>Rodzaj abonamentu</label>
+            <select id="zlecenie-abonament-typ">
+              <option value="PL">Abonament PL</option>
+              <option value="UE">Abonament UE</option>
+              <option value="INNE">Inne</option>
+            </select>
+          </div>
+          <div>
+            <label>Abonament miesięczny (dla klienta, PLN)</label>
+            <input type="number" id="zlecenie-abonament-kwota" min="0" step="0.01" placeholder="np. 29">
+          </div>
+          <div>
+            <label>Cena montażu dla klienta (PLN)</label>
+            <input type="number" id="zlecenie-cena-instalatora" min="0" step="0.01" placeholder="np. 150">
+          </div>
+          <div>
+            <label>NIP firmy klienta</label>
+            <input type="text" id="zlecenie-nip" placeholder="np. 5250000000">
+          </div>
+          <div>
+            <label>Dane z GUS (demo)</label>
+            <div class="btn-inline-group">
+              <button class="btn btn-secondary btn-sm" type="button" onclick="pobierzDaneGUS()">Pobierz dane z GUS</button>
+              <span class="small-muted">W wersji serwerowej tu będzie prawdziwe API GUS.</span>
+            </div>
+          </div>
+          <div>
+            <label>Nazwa firmy</label>
+            <input type="text" id="zlecenie-firma" placeholder="Nazwa z GUS lub wpisz ręcznie">
+          </div>
+          <div>
+            <label>Adres</label>
+            <input type="text" id="zlecenie-adres" placeholder="Ulica, kod, miasto">
+          </div>
+          <div>
+            <label>Telefon</label>
+            <input type="tel" id="zlecenie-telefon" placeholder="np. +48 600 000 000">
+          </div>
+          <div>
+            <label>E-mail</label>
+            <input type="email" id="zlecenie-email" placeholder="np. biuro@firma.pl">
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <label>Notatka / opis zlecenia</label>
+          <textarea id="zlecenie-notatka" placeholder="Dodatkowe informacje: numer pojazdu, VIN, preferowana data, uwagi techniczne..."></textarea>
+        </div>
+        <div class="btn-inline-group">
+          <button class="btn btn-primary" type="button" onclick="dodajZlecenie()">➕ Dodaj zlecenie</button>
+          <button class="btn btn-secondary" type="button" onclick="wyczyscFormularzZlecenie()">Wyczyść formularz</button>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1; min-height:0;">
+        <div class="card-header">
+          <div class="card-title">Lista zleceń</div>
+          <div class="card-subtitle">Przegląd sprzedaży urządzeń, abonamentów i montażu</div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+            <tr>
+              <th>Data</th>
+              <th>Rodzaj</th>
+              <th>Urządzenie</th>
+              <th>Cena urz. (zł)</th>
+              <th>Abonament (typ / zł)</th>
+              <th>Montaż (zł)</th>
+              <th>Firma</th>
+              <th>NIP</th>
+            </tr>
+            </thead>
+            <tbody id="zlecenia-tbody">
+            <!-- wypełniane z JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZAKŁADKA: ZADANIA -->
+    <div id="tab-zadania" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Nowe zadanie</div>
+          <div class="card-subtitle">Ticket na tablicy z przypisaniem do konkretnej osoby</div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Tytuł zadania</label>
+            <input type="text" id="task-title" placeholder="np. Montaż FMT100 – VW Crafter">
+          </div>
+          <div>
+            <label>Osoba odpowiedzialna</label>
+            <select id="task-assignee">
+              <option value="TOMEK">TOMEK</option>
+              <option value="DAWID">DAWID</option>
+              <option value="MICHAŁ">MICHAŁ</option>
+              <option value="JANUSZ">JANUSZ</option>
+              <option value="JAKUB">JAKUB</option>
+            </select>
+          </div>
+          <div>
+            <label>Czas realizacji (dni)</label>
+            <input type="number" id="task-days" min="1" value="3">
+          </div>
+          <div>
+            <label>Powiązane zlecenie (opcjonalnie)</label>
+            <input type="text" id="task-zlecenie" placeholder="np. ID zlecenia, nazwa klienta">
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <label>Opis zadania</label>
+          <textarea id="task-description" placeholder="Opis kroków, informacje dla montera / serwisu..."></textarea>
+        </div>
+        <div class="btn-inline-group">
+          <button class="btn btn-primary" type="button" onclick="dodajZadanie()">➕ Dodaj zadanie</button>
+          <button class="btn btn-secondary" type="button" onclick="wyczyscFormularzZadanie()">Wyczyść</button>
+        </div>
+      </div>
+
+      <div class="kanban-container" id="kanban-container">
+        <!-- kolumny kanbana generujemy w JS -->
+      </div>
+    </div>
+
+    <!-- ZAKŁADKA: RENTOWNOŚĆ -->
+    <div id="tab-rentownosc" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Ustawienia kosztów – rentowność</div>
+          <div class="card-subtitle">Koszt zakupu urządzeń, koszt abonamentów oraz podstawowy koszt instalatora</div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Cena zakupu FMT100 (hurt, PLN)</label>
+            <input type="number" id="cost-device-FMT100" min="0" step="0.01" placeholder="np. 180">
+          </div>
+          <div>
+            <label>Cena zakupu FMC880 (hurt, PLN)</label>
+            <input type="number" id="cost-device-FMC880" min="0" step="0.01" placeholder="np. 200">
+          </div>
+          <div>
+            <label>Cena zakupu FMB920 (hurt, PLN)</label>
+            <input type="number" id="cost-device-FMB920" min="0" step="0.01" placeholder="np. 150">
+          </div>
+          <div>
+            <label>Cena zakupu FMC650 (hurt, PLN)</label>
+            <input type="number" id="cost-device-FMC650" min="0" step="0.01" placeholder="np. 250">
+          </div>
+          <div>
+            <label>Cena zakupu FMC130 (hurt, PLN)</label>
+            <input type="number" id="cost-device-FMC130" min="0" step="0.01" placeholder="np. 220">
+          </div>
+          <div>
+            <label>Cena zakupu – inne urządzenia (hurt, PLN)</label>
+            <input type="number" id="cost-device-inne" min="0" step="0.01" placeholder="domyślna cena zakupu dla innych">
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-top:14px;">
+          <div>
+            <label>Podstawowy koszt abonamentu PL (miesięczny, PLN)</label>
+            <input type="number" id="cost-abonament-PL" min="0" step="0.01" placeholder="np. 5">
+          </div>
+          <div>
+            <label>Podstawowy koszt abonamentu UE (miesięczny, PLN)</label>
+            <input type="number" id="cost-abonament-UE" min="0" step="0.01" placeholder="np. 9">
+          </div>
+          <div>
+            <label>Podstawowy koszt abonamentu INNE (miesięczny, PLN)</label>
+            <input type="number" id="cost-abonament-INNE" min="0" step="0.01" placeholder="np. 7">
+          </div>
+          <div>
+            <label>Podstawowy koszt instalatora za montaż (PLN)</label>
+            <input type="number" id="cost-installer-base" min="0" step="0.01" placeholder="np. 80">
+          </div>
+        </div>
+
+        <div class="btn-inline-group">
+          <button class="btn btn-primary" type="button" onclick="zapiszUstawieniaRentownosci()">💾 Zapisz ustawienia kosztów</button>
+          <span class="small-muted">Te wartości są używane do liczenia marży dla każdego zlecenia.</span>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1; min-height:0;">
+        <div class="card-header">
+          <div class="card-title">Analiza rentowności zleceń</div>
+          <div class="card-subtitle">Na podstawie wpisanych zleceń i powyższych kosztów</div>
+        </div>
+
+        <div class="stat-grid" id="rentownosc-summary">
+          <!-- wypełniane z JS -->
+        </div>
+
+        <div class="table-wrapper" style="margin-top:10px;">
+          <table>
+            <thead>
+            <tr>
+              <th>Data</th>
+              <th>Firma</th>
+              <th>Urz. / sprzedaż / koszt / marża</th>
+              <th>Abon. / typ / sprzedaż / koszt / marża</th>
+              <th>Montaż / przychód / koszt / marża</th>
+              <th>Marża łączna</th>
+            </tr>
+            </thead>
+            <tbody id="rentownosc-tbody">
+            <!-- wypełniane z JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRAWY PANEL – ZAKŁADKI -->
+  <div class="right-tabs">
+    <div class="tabs-title">Nawigacja</div>
+    <button class="tab-button active" data-tab="zlecenia" onclick="zmienZakladke('zlecenia')">
+      <span>ZLECENIA</span>
+      <span class="tab-badge" id="badge-zlecenia">0</span>
+    </button>
+    <button class="tab-button" data-tab="zadania" onclick="zmienZakladke('zadania')">
+      <span>ZADANIA</span>
+      <span class="tab-badge" id="badge-zadania">0</span>
+    </button>
+    <button class="tab-button" data-tab="rentownosc" onclick="zmienZakladke('rentownosc')">
+      <span>RENTOWNOŚĆ</span>
+      <span class="tab-badge" id="badge-rentownosc">0</span>
+    </button>
+    <div class="spacer"></div>
+    <div class="footer-note">
+      Demo offline<br>Można później podpiąć serwer i bazę.
+    </div>
+  </div>
+</div>
+
+<script>
+  // === GLOBALNE DANE ===
+  let zlecenia = [];
+  let zadania = [];
+
+  let rentSettings = {
+    deviceCosts: {
+      FMT100: 0,
+      FMC880: 0,
+      FMB920: 0,
+      FMC650: 0,
+      FMC130: 0,
+      inne: 0
+    },
+    abonamentCosts: {
+      PL: 0,
+      UE: 0,
+      INNE: 0
+    },
+    installerBaseCost: 0
+  };
+
+  function loadFromStorage() {
+    try {
+      const zData = localStorage.getItem('crm_zlecenia_v2');
+      const tData = localStorage.getItem('crm_zadania_v2');
+      const rData = localStorage.getItem('crm_rentownosc_settings_v2');
+
+      if (zData) zlecenia = JSON.parse(zData);
+      if (tData) zadania = JSON.parse(tData);
+      if (rData) {
+        const parsed = JSON.parse(rData);
+        rentSettings = Object.assign({}, rentSettings, parsed);
+        if (parsed.deviceCosts) {
+          rentSettings.deviceCosts = Object.assign({}, rentSettings.deviceCosts, parsed.deviceCosts);
+        }
+        if (parsed.abonamentCosts) {
+          rentSettings.abonamentCosts = Object.assign({}, rentSettings.abonamentCosts, parsed.abonamentCosts);
+        }
+      }
+    } catch (e) {
+      console.error('Błąd odczytu z localStorage', e);
+    }
+  }
+
+  function saveToStorage() {
+    localStorage.setItem('crm_zlecenia_v2', JSON.stringify(zlecenia));
+    localStorage.setItem('crm_zadania_v2', JSON.stringify(zadania));
+    localStorage.setItem('crm_rentownosc_settings_v2', JSON.stringify(rentSettings));
+  }
+
+  function zmienZakladke(name) {
+    document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      if (btn.getAttribute('data-tab') === name) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+
+    if (name === 'rentownosc') {
+      wypelnijFormularzRentownosci();
+      renderRentownosc();
+    }
+  }
+
+  // === ZLECENIA ===
+  function pobierzDaneGUS() {
+    const nip = document.getElementById('zlecenie-nip').value.trim();
+    if (!nip) {
+      alert('Podaj NIP, żeby zasymulować pobranie danych z GUS.');
+      return;
+    }
+    document.getElementById('zlecenie-firma').value = 'Demo Firma ' + nip;
+    document.getElementById('zlecenie-adres').value = 'Ulica Przykładowa 1, 00-000 Miasto';
+    alert('Demo: dane klienta zostały uzupełnione. W wersji serwerowej tu będzie prawdziwe zapytanie do GUS.');
+  }
+
+  function dodajZlecenie() {
+    const rodzaj = document.getElementById('zlecenie-rodzaj').value;
+    const urzadzenieSelect = document.getElementById('zlecenie-urzadzenie').value;
+    const urzadzenieInne = document.getElementById('zlecenie-urzadzenie-inne').value.trim();
+    const cenaUrzadzenia = parseFloat(document.getElementById('zlecenie-cena-urzadzenia').value || '0');
+    const abonamentTyp = document.getElementById('zlecenie-abonament-typ').value;
+    const abonamentKwota = parseFloat(document.getElementById('zlecenie-abonament-kwota').value || '0');
+    const cenaInstalatoraSprzedaz = parseFloat(document.getElementById('zlecenie-cena-instalatora').value || '0');
+
+    const nip = document.getElementById('zlecenie-nip').value.trim();
+    const firma = document.getElementById('zlecenie-firma').value.trim();
+    const adres = document.getElementById('zlecenie-adres').value.trim();
+    const telefon = document.getElementById('zlecenie-telefon').value.trim();
+    const email = document.getElementById('zlecenie-email').value.trim();
+    const notatka = document.getElementById('zlecenie-notatka').value.trim();
+
+    if (!firma || !nip) {
+      alert('Podaj minimum NIP i nazwę firmy.');
+      return;
+    }
+
+    const urzadzenie = urzadzenieSelect === 'inne' && urzadzenieInne
+      ? urzadzenieInne
+      : urzadzenieSelect;
+
+    const now = new Date();
+    const z = {
+      id: 'Z' + Date.now(),
+      data: now.toISOString(),
+      rodzaj,
+      urzadzenie,
+      cenaUrzadzenia,
+      abonamentTyp,
+      abonamentKwota,
+      cenaInstalatoraSprzedaz,
+      nip,
+      firma,
+      adres,
+      telefon,
+      email,
+      notatka
+    };
+
+    zlecenia.unshift(z);
+    saveToStorage();
+    renderZlecenia();
+    updateBadges();
+    wyczyscFormularzZlecenie();
+  }
+
+  function renderZlecenia() {
+    const tbody = document.getElementById('zlecenia-tbody');
+    tbody.innerHTML = '';
+    zlecenia.forEach(z => {
+      const tr = document.createElement('tr');
+      const data = new Date(z.data);
+      const rodzajLabel = z.rodzaj === 'serwis'
+        ? '<span class="chip chip-serwis">Serwis</span>'
+        : (z.rodzaj === 'montaz'
+            ? '<span class="chip">Montaż</span>'
+            : '<span class="chip">Inne</span>');
+
+      const urz = z.urzadzenie || '';
+      const abonTyp = z.abonamentTyp || '';
+      const abonKwota = (z.abonamentKwota || 0).toFixed(2);
+
+      tr.innerHTML = `
+        <td>${data.toLocaleDateString()}</td>
+        <td>${rodzajLabel}</td>
+        <td>${urz}</td>
+        <td>${(z.cenaUrzadzenia || 0).toFixed(2)}</td>
+        <td>${abonTyp} / ${abonKwota}</td>
+        <td>${(z.cenaInstalatoraSprzedaz || 0).toFixed(2)}</td>
+        <td>${z.firma}</td>
+        <td>${z.nip}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function wyczyscFormularzZlecenie() {
+    document.getElementById('zlecenie-rodzaj').value = 'montaz';
+    document.getElementById('zlecenie-urzadzenie').value = 'FMT100';
+    document.getElementById('zlecenie-urzadzenie-inne').value = '';
+    document.getElementById('zlecenie-cena-urzadzenia').value = '';
+    document.getElementById('zlecenie-abonament-typ').value = 'PL';
+    document.getElementById('zlecenie-abonament-kwota').value = '';
+    document.getElementById('zlecenie-cena-instalatora').value = '';
+    document.getElementById('zlecenie-notatka').value = '';
+    // klient zostaje – przy serii zleceń dla tej samej firmy
+  }
+
+  // === ZADANIA / KANBAN ===
+  const KANBAN_COLUMNS = [
+    { key: 'todo',      label: 'Do zrobienia' },
+    { key: 'inprogress',label: 'W trakcie' },
+    { key: 'review',    label: 'Do odbioru / testów' },
+    { key: 'done',      label: 'Zakończone' }
+  ];
+
+  function dodajZadanie() {
+    const title = document.getElementById('task-title').value.trim();
+    const assignee = document.getElementById('task-assignee').value;
+    const days = Number(document.getElementById('task-days').value || 3);
+    const relZlecenie = document.getElementById('task-zlecenie').value.trim();
+    const description = document.getElementById('task-description').value.trim();
+
+    if (!title) {
+      alert('Podaj tytuł zadania.');
+      return;
+    }
+
+    const now = new Date();
+    const due = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+
+    const t = {
+      id: 'T' + Date.now(),
+      title,
+      assignee,
+      days,
+      related: relZlecenie,
+      description,
+      createdAt: now.toISOString(),
+      dueDate: due.toISOString(),
+      status: 'todo'
+    };
+
+    zadania.unshift(t);
+    saveToStorage();
+    renderKanban();
+    updateBadges();
+    wyczyscFormularzZadanie();
+  }
+
+  function wyczyscFormularzZadanie() {
+    document.getElementById('task-title').value = '';
+    document.getElementById('task-description').value = '';
+    document.getElementById('task-zlecenie').value = '';
+    document.getElementById('task-days').value = 3;
+  }
+
+  function renderKanban() {
+    const container = document.getElementById('kanban-container');
+    container.innerHTML = '';
+
+    KANBAN_COLUMNS.forEach(col => {
+      const colTasks = zadania.filter(t => t.status === col.key);
+      const colDiv = document.createElement('div');
+      colDiv.className = 'kanban-column';
+      colDiv.setAttribute('data-column', col.key);
+      colDiv.addEventListener('dragover', handleDragOver);
+      colDiv.addEventListener('drop', handleDrop);
+
+      colDiv.innerHTML = `
+        <div class="kanban-column-header">
+          <div class="kanban-title">${col.label}</div>
+          <div class="kanban-count">${colTasks.length}</div>
+        </div>
+      `;
+
+      colTasks.forEach(t => {
+        const card = createTaskCard(t);
+        colDiv.appendChild(card);
+      });
+
+      container.appendChild(colDiv);
+    });
+  }
+
+  function createTaskCard(task) {
+    const now = new Date();
+    const due = new Date(task.dueDate);
+    const overdue = now > due;
+    const card = document.createElement('div');
+    card.className = 'task-card';
+    if (overdue && task.status !== 'done') {
+      card.classList.add('overdue-border');
+    }
+    card.setAttribute('draggable', 'true');
+    card.setAttribute('data-id', task.id);
+    card.addEventListener('dragstart', handleDragStart);
+    card.addEventListener('dragend', handleDragEnd);
+
+    const dueLabel = overdue && task.status !== 'done'
+      ? `<span class="task-due overdue">PO TERMINIE (${due.toLocaleDateString()})</span>`
+      : `<span class="task-due">Do ${due.toLocaleDateString()}</span>`;
+
+    card.innerHTML = `
+      <div class="task-header-line">
+        <div class="task-title">${task.title}</div>
+        <span class="task-assignee">${task.assignee}</span>
+      </div>
+      <div class="task-meta">
+        <span>${task.days} dni</span>
+        ${task.related ? ` • <span>${task.related}</span>` : ''}
+      </div>
+      <div class="task-meta">
+        ${dueLabel}
+      </div>
+      ${task.description ? `<div class="small-muted" style="margin-top:4px;">${task.description}</div>` : ''}
+    `;
+    return card;
+  }
+
+  let draggedTaskId = null;
+
+  function handleDragStart(e) {
+    draggedTaskId = this.getAttribute('data-id');
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function handleDragEnd() {
+    this.classList.remove('dragging');
+    draggedTaskId = null;
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    const colKey = this.getAttribute('data-column');
+    if (!draggedTaskId) return;
+    const task = zadania.find(t => t.id === draggedTaskId);
+    if (!task) return;
+    task.status = colKey;
+    saveToStorage();
+    renderKanban();
+    updateBadges();
+  }
+
+  // === RENTOWNOŚĆ ===
+  function wypelnijFormularzRentownosci() {
+    document.getElementById('cost-device-FMT100').value = rentSettings.deviceCosts.FMT100 || '';
+    document.getElementById('cost-device-FMC880').value = rentSettings.deviceCosts.FMC880 || '';
+    document.getElementById('cost-device-FMB920').value = rentSettings.deviceCosts.FMB920 || '';
+    document.getElementById('cost-device-FMC650').value = rentSettings.deviceCosts.FMC650 || '';
+    document.getElementById('cost-device-FMC130').value = rentSettings.deviceCosts.FMC130 || '';
+    document.getElementById('cost-device-inne').value = rentSettings.deviceCosts.inne || '';
+
+    document.getElementById('cost-abonament-PL').value = rentSettings.abonamentCosts.PL || '';
+    document.getElementById('cost-abonament-UE').value = rentSettings.abonamentCosts.UE || '';
+    document.getElementById('cost-abonament-INNE').value = rentSettings.abonamentCosts.INNE || '';
+
+    document.getElementById('cost-installer-base').value = rentSettings.installerBaseCost || '';
+  }
+
+  function zapiszUstawieniaRentownosci() {
+    rentSettings.deviceCosts.FMT100 = parseFloat(document.getElementById('cost-device-FMT100').value || '0');
+    rentSettings.deviceCosts.FMC880 = parseFloat(document.getElementById('cost-device-FMC880').value || '0');
+    rentSettings.deviceCosts.FMB920 = parseFloat(document.getElementById('cost-device-FMB920').value || '0');
+    rentSettings.deviceCosts.FMC650 = parseFloat(document.getElementById('cost-device-FMC650').value || '0');
+    rentSettings.deviceCosts.FMC130 = parseFloat(document.getElementById('cost-device-FMC130').value || '0');
+    rentSettings.deviceCosts.inne  = parseFloat(document.getElementById('cost-device-inne').value || '0');
+
+    rentSettings.abonamentCosts.PL   = parseFloat(document.getElementById('cost-abonament-PL').value || '0');
+    rentSettings.abonamentCosts.UE   = parseFloat(document.getElementById('cost-abonament-UE').value || '0');
+    rentSettings.abonamentCosts.INNE = parseFloat(document.getElementById('cost-abonament-INNE').value || '0');
+
+    rentSettings.installerBaseCost = parseFloat(document.getElementById('cost-installer-base').value || '0');
+
+    saveToStorage();
+    renderRentownosc();
+    alert('Ustawienia kosztów zapisane. Rentowność przeliczona.');
+  }
+
+  function getDeviceCostForZlecenie(z) {
+    const type = z.urzadzenie || '';
+    if (rentSettings.deviceCosts[type] != null && !isNaN(rentSettings.deviceCosts[type])) {
+      return rentSettings.deviceCosts[type];
+    }
+    return rentSettings.deviceCosts.inne || 0;
+  }
+
+  function getAbonamentCostForZlecenie(z) {
+    const typ = z.abonamentTyp || 'INNE';
+    const cost = rentSettings.abonamentCosts[typ];
+    return cost != null ? cost : (rentSettings.abonamentCosts.INNE || 0);
+  }
+
+  function renderRentownosc() {
+    const tbody = document.getElementById('rentownosc-tbody');
+    const summaryDiv = document.getElementById('rentownosc-summary');
+    tbody.innerHTML = '';
+    summaryDiv.innerHTML = '';
+
+    let totalRevenue = 0;
+    let totalCost = 0;
+    let totalMargin = 0;
+
+    zlecenia.forEach(z => {
+      const data = new Date(z.data);
+      const deviceSale = z.cenaUrzadzenia || 0;
+      const deviceCost = getDeviceCostForZlecenie(z);
+      const deviceMargin = deviceSale - deviceCost;
+
+      const abonSale = z.abonamentKwota || 0;
+      const abonCost = getAbonamentCostForZlecenie(z);
+      const abonMargin = abonSale - abonCost;
+
+      const installSale = z.cenaInstalatoraSprzedaz || 0;
+      const installCost = rentSettings.installerBaseCost || 0;
+      const installMargin = installSale - installCost;
+
+      const revenue = deviceSale + abonSale + installSale;
+      const cost = deviceCost + abonCost + installCost;
+      const margin = revenue - cost;
+
+      totalRevenue += revenue;
+      totalCost += cost;
+      totalMargin += margin;
+
+      const tr = document.createElement('tr');
+
+      const marginClass = margin >= 0 ? 'stat-positive' : 'stat-negative';
+      const devMarginClass = deviceMargin >= 0 ? 'stat-positive' : 'stat-negative';
+      const abonMarginClass = abonMargin >= 0 ? 'stat-positive' : 'stat-negative';
+      const instMarginClass = installMargin >= 0 ? 'stat-positive' : 'stat-negative';
+
+      tr.innerHTML = `
+        <td>${data.toLocaleDateString()}</td>
+        <td>${z.firma}</td>
+        <td>
+          ${z.urzadzenie || '-'}<br>
+          <span class="small-muted">sprz.: ${deviceSale.toFixed(2)} zł • koszt: ${deviceCost.toFixed(2)} zł</span><br>
+          <span class="${devMarginClass} small-muted">marża: ${deviceMargin.toFixed(2)} zł</span>
+        </td>
+        <td>
+          ${z.abonamentTyp || '-'}<br>
+          <span class="small-muted">sprz.: ${abonSale.toFixed(2)} zł • koszt: ${abonCost.toFixed(2)} zł</span><br>
+          <span class="${abonMarginClass} small-muted">marża: ${abonMargin.toFixed(2)} zł / mies.</span>
+        </td>
+        <td>
+          <span class="small-muted">sprz.: ${installSale.toFixed(2)} zł • koszt: ${installCost.toFixed(2)} zł</span><br>
+          <span class="${instMarginClass} small-muted">marża: ${installMargin.toFixed(2)} zł</span>
+        </td>
+        <td>
+          <span class="${marginClass}">${margin.toFixed(2)} zł</span><br>
+          <span class="small-muted">przychód: ${revenue.toFixed(2)} zł • koszt: ${cost.toFixed(2)} zł</span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const count = zlecenia.length;
+    const avgMargin = count > 0 ? totalMargin / count : 0;
+
+    const totalMarginClass = totalMargin >= 0 ? 'stat-positive' : 'stat-negative';
+    const avgMarginClass = avgMargin >= 0 ? 'stat-positive' : 'stat-negative';
+
+    summaryDiv.innerHTML = `
+      <div class="stat-box">
+        <div class="stat-label">Liczba zleceń</div>
+        <div class="stat-value">${count}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Suma przychodu (urządzenie + abonament + montaż)</div>
+        <div class="stat-value">${totalRevenue.toFixed(2)} zł</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Suma kosztów (zakup + abonament + instalator)</div>
+        <div class="stat-value">${totalCost.toFixed(2)} zł</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Suma marży łącznej</div>
+        <div class="stat-value ${totalMarginClass}">${totalMargin.toFixed(2)} zł</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Średnia marża na zleceniu</div>
+        <div class="stat-value ${avgMarginClass}">${avgMargin.toFixed(2)} zł</div>
+      </div>
+    `;
+  }
+
+  // === BADGE / PODSUMOWANIA ===
+  function updateBadges() {
+    document.getElementById('badge-zlecenia').innerText = zlecenia.length;
+    document.getElementById('badge-zadania').innerText = zadania.length;
+    document.getElementById('badge-rentownosc').innerText = zlecenia.length;
+  }
+
+  function refreshOverdueHighlight() {
+    renderKanban();
+  }
+
+  // Inicjalizacja
+  loadFromStorage();
+  renderZlecenia();
+  renderKanban();
+  updateBadges();
+  wypelnijFormularzRentownosci();
+  renderRentownosc();
+
+  setInterval(refreshOverdueHighlight, 60 * 1000);
+</script>
+</body>
+</html>
